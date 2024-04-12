@@ -170,7 +170,22 @@ def computeMOPSDescriptors(image, features):
         # Note: use grayImage to compute features on, not the input image
         # TODO-BLOCK-BEGIN
 
-        #raise NotImplementedError("TODO Unimplemented")
+        harrisMatrix, orientationMatrix = computeHarrisValues(grayImage)
+
+        #t1_m = np.zeros((4,3))
+        #r_m = np.zeros((4,4))
+        #s_m = np.zeros((4,4))
+        #t2_m = np.zeros((2,4))
+
+        r_m = transformations.get_rot_mx(0, 0, f[2])
+        t1_m_init= transformations.get_trans_mx(np.array([f[0], f[1], 0]))
+        t2_m_init = transformations.get_trans_mx(np.array([-4, -4, 0]))
+        s_m = transformations.get_scale_mx(0.2, 0.2, 1)
+
+        transMx_init = t2_m_init @ s_m @ r_m @ t1_m_init
+        transMx = transMx_init[:2, :3]
+
+  
         # TODO-BLOCK-END
 
         # Call the warp affine function to do the mapping
@@ -184,7 +199,14 @@ def computeMOPSDescriptors(image, features):
         # vector to zero. Lastly, write the vector to desc.
         # TODO-BLOCK-BEGIN
 
-        #raise NotImplementedError("TODO Unimplemented")
+        sub_mean = np.array(destImage) - np.mean(np.array(destImage))
+        norm = np.linalg.norm(sub_mean)
+        normalized = sub_mean / norm
+
+        if np.var(normalized) < float('1e-10'):
+             normalized = normalized * 0
+
+        desc[i] = normalized.flatten()
         # TODO-BLOCK-END
 
     return desc
@@ -194,9 +216,7 @@ def computeMOPSDescriptors(image, features):
 def produceMatches(desc_img1, desc_img2):
     """
     Input:
-        corners_img1 -- list of corners produced by detectCorners on image 1
         desc_img1 -- corresponding set of MOPS descriptors for image 1
-        corners_img2 -- list of corners produced by detectCorners on image 2
         desc_img2 -- corresponding set of MOPS descriptors for image 2
 
     Output:
