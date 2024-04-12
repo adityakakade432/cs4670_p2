@@ -122,7 +122,12 @@ def detectCorners(harrisImage, orientationImage):
         # construct the corresponding corner tuple of each local maxima.
         # Return features, a list of all such features.
         # TODO-BLOCK-BEGIN
-
+        destImage = computeLocalMaximaHelper(harrisImage)
+        for y in range(height):
+             for x in range(width):
+                  if destImage[y, x]:
+                       corner_tuple = (x, y, orientationImage[y, x], harrisImage[y,x])
+                       features.append(corner_tuple)
         # TODO-BLOCK-END
 
         return features
@@ -161,7 +166,7 @@ def computeMOPSDescriptors(image, features):
         # Note: use grayImage to compute features on, not the input image
         # TODO-BLOCK-BEGIN
 
-        raise NotImplementedError("TODO Unimplemented")
+        #raise NotImplementedError("TODO Unimplemented")
         # TODO-BLOCK-END
 
         # Call the warp affine function to do the mapping
@@ -175,7 +180,7 @@ def computeMOPSDescriptors(image, features):
         # vector to zero. Lastly, write the vector to desc.
         # TODO-BLOCK-BEGIN
 
-        raise NotImplementedError("TODO Unimplemented")
+        #raise NotImplementedError("TODO Unimplemented")
         # TODO-BLOCK-END
 
     return desc
