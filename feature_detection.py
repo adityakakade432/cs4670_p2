@@ -48,8 +48,22 @@ def computeHarrisValues(srcImage):
         # each pixel and store in 'harrisImage'. Also compute an 
         # orientation for each pixel and store it in 'orientationImage.'
         # TODO-BLOCK-BEGIN
-        raise NotImplementedError("TODO Unimplemented")   
-        
+        w_p = scipy.ndimage.gaussian_filter(srcImage, sigma=0.5, truncate=3.0)
+        i_xp = scipy.ndimage.sobel(srcImage, axis=0)
+        i_yp = scipy.ndimage.sobel(srcImage, axis=1)
+
+        harris_matrix = np.zeros((2, 2))
+        for y in range(height):
+            for x in range(width):
+                w_yx = w_p[y, x]
+                harris_matrix[0, 0] = w_yx * (i_xp[y,x]**2)
+                harris_matrix[0, 1] = w_yx * (i_xp[y,x]* i_yp[y,x])
+                harris_matrix[1, 0] = harris_matrix[0, 1]
+                harris_matrix[0, 0] = w_yx * (i_yp[y,x]**2)
+
+                harrisImage[y, x] = np.linalg.det(harris_matrix) - 0.1 * (np.trace(harris_matrix) ** 2)
+
+                orientationImage[y, x] = np.arctan(i_yp[y, x] / i_xp[y, x])
         # TODO-BLOCK-END
 
         return harrisImage, orientationImage
