@@ -49,17 +49,17 @@ def computeHarrisValues(srcImage):
         # orientation for each pixel and store it in 'orientationImage.'
         # TODO-BLOCK-BEGIN
         w_p = scipy.ndimage.gaussian_filter(srcImage, sigma=0.5, truncate=3.0)
-        i_xp = scipy.ndimage.sobel(srcImage, axis=0)
-        i_yp = scipy.ndimage.sobel(srcImage, axis=1)
+        i_xp = scipy.ndimage.sobel(srcImage, axis=0, mode='nearest')
+        i_yp = scipy.ndimage.sobel(srcImage, axis=1, mode='nearest')
 
         harris_matrix = np.zeros((2, 2))
         for y in range(height):
             for x in range(width):
                 w_yx = w_p[y, x]
-                harris_matrix[0, 0] = w_yx * (i_xp[y,x]**2)
-                harris_matrix[0, 1] = w_yx * (i_xp[y,x]* i_yp[y,x])
+                harris_matrix[0, 0] = w_yx * (i_xp[y, x]**2)
+                harris_matrix[0, 1] = w_yx * (i_xp[y, x]* i_yp[y, x])
                 harris_matrix[1, 0] = harris_matrix[0, 1]
-                harris_matrix[0, 0] = w_yx * (i_yp[y,x]**2)
+                harris_matrix[0, 0] = w_yx * (i_yp[y, x]**2)
 
                 harrisImage[y, x] = np.linalg.det(harris_matrix) - 0.1 * (np.trace(harris_matrix) ** 2)
 
@@ -87,7 +87,11 @@ def computeLocalMaximaHelper(harrisImage):
 
         # TODO 2: Compute the local maxima image
         # TODO-BLOCK-BEGIN
-        raise NotImplementedError("TODO Unimplemented")
+        height, width = harrisImage.shape
+        max_filter = scipy.ndimage.filters.maximum_filter(harrisImage, size=(7,7), mode='nearest')
+        for y in range(height):
+            for x in range(width):
+                destImage[y, x] = True if harrisImage[y, x] == max_filter[y, x] else False
         # TODO-BLOCK-END
 
         return destImage
@@ -118,7 +122,7 @@ def detectCorners(harrisImage, orientationImage):
         # construct the corresponding corner tuple of each local maxima.
         # Return features, a list of all such features.
         # TODO-BLOCK-BEGIN
-        raise NotImplementedError("TODO Unimplemented")
+
         # TODO-BLOCK-END
 
         return features
