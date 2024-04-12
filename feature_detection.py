@@ -45,25 +45,29 @@ def computeHarrisValues(srcImage):
         orientationImage = np.zeros(srcImage.shape[:2])
 
         # TODO 1: Compute the harris corner strength for 'srcImage' at
-        # each pixel and store in 'harrisImage'. Also compute an 
+        # each pixel and store in 'harrisImage'. Also compute an
         # orientation for each pixel and store it in 'orientationImage.'
         # TODO-BLOCK-BEGIN
-        w_p = scipy.ndimage.gaussian_filter(srcImage, sigma=0.5, truncate=3.0)
-        i_xp = scipy.ndimage.sobel(srcImage, axis=0, mode='nearest')
-        i_yp = scipy.ndimage.sobel(srcImage, axis=1, mode='nearest')
+        i_xp = scipy.ndimage.sobel(srcImage, axis=1, mode='nearest')
+        i_yp = scipy.ndimage.sobel(srcImage, axis=0, mode='nearest')
+
+        w_p_00 = scipy.ndimage.gaussian_filter(np.square(i_xp), sigma=0.5, truncate=3.0, mode='nearest')
+        w_p_01 = scipy.ndimage.gaussian_filter(np.multiply(i_xp, i_yp), sigma=0.5, truncate=3.0, mode='nearest')
+        w_p_10 = w_p_01
+        w_p_11 = scipy.ndimage.gaussian_filter(np.square(i_yp), sigma=0.5, truncate=3.0, mode='nearest')
 
         harris_matrix = np.zeros((2, 2))
         for y in range(height):
             for x in range(width):
-                w_yx = w_p[y, x]
-                harris_matrix[0, 0] = w_yx * (i_xp[y, x]**2)
-                harris_matrix[0, 1] = w_yx * (i_xp[y, x]* i_yp[y, x])
-                harris_matrix[1, 0] = harris_matrix[0, 1]
-                harris_matrix[0, 0] = w_yx * (i_yp[y, x]**2)
+                # w_yx = w_p[y, x]
+                harris_matrix[0, 0] = w_p_00[y, x]
+                harris_matrix[0, 1] = w_p_01[y, x]
+                harris_matrix[1, 0] = w_p_10[y, x]
+                harris_matrix[1, 1] = w_p_11[y, x]
 
                 harrisImage[y, x] = np.linalg.det(harris_matrix) - 0.1 * (np.trace(harris_matrix) ** 2)
 
-                orientationImage[y, x] = np.arctan(i_yp[y, x] / i_xp[y, x])
+        orientationImage = np.degrees(np.arctan2(i_yp, i_xp))
         # TODO-BLOCK-END
 
         return harrisImage, orientationImage
@@ -105,10 +109,10 @@ def detectCorners(harrisImage, orientationImage):
             orientationImage -- numpy array containing the orientation of the
                                 gradient at each pixel in degrees.
         Output:
-            features -- list of all detected features. Entries should 
+            features -- list of all detected features. Entries should
             take the following form:
             (x-coord, y-coord, angle of gradient, the detector response)
-            
+
             x-coord: x coordinate in the image
             y-coord: y coordinate in the image
             angle of the gradient: angle of the gradient in degrees
@@ -118,7 +122,7 @@ def detectCorners(harrisImage, orientationImage):
         features = []
 
         # TODO 3: Select the strongest keypoints in a 7 x 7 area, according to
-        # the corner strength function. Once local maxima are identified then 
+        # the corner strength function. Once local maxima are identified then
         # construct the corresponding corner tuple of each local maxima.
         # Return features, a list of all such features.
         # TODO-BLOCK-BEGIN
