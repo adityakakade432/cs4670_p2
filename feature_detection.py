@@ -243,6 +243,7 @@ def produceMatches(desc_img1, desc_img2):
     # TODO-BLOCK-BEGIN
 
     # Handling when there's less than 2 features but more than 0
+    f_length = desc_img1.shape[1]
     if desc_img1.shape[0] == 1:
         for i in range(desc_img2.shape[0]):
             matches.append((0, i, 0))
@@ -253,7 +254,10 @@ def produceMatches(desc_img1, desc_img2):
         return matches
 
     for i, feature in enumerate(desc_img1):
-        distances = np.array(map(lambda x: scipy.spatial.distance.cdist(feature, x) ** 2, desc_img2))
+        dist_list = list(map(lambda x: scipy.spatial.distance.cdist(np.reshape(feature, (1, f_length)), np.reshape(x, (1,f_length)))[0, 0] ** 2, desc_img2))
+        print(f"dist list is {dist_list}")
+        distances = np.array(dist_list)
+        print(f"distances is {distances}")
 
         closest = np.argmin(distances)
         closest_dist = distances[closest]
@@ -261,7 +265,7 @@ def produceMatches(desc_img1, desc_img2):
             matches.append((i, closest, 1))
             continue
 
-        distances.pop(closest)
+        distances = np.delete(distances, closest)
         second_dist = distances.min(distances)
 
         ratio = closest_dist / second_dist

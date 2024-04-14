@@ -109,10 +109,12 @@ desc1[0, 0] = 0
 desc1[0, 1] = 0
 desc1[1, 0] = 0
 desc1[1, 1] = 1
-desc2 = np.zeros((2, 2))
+desc2 = np.zeros((3, 2))
 desc2[0, 0] = 0.5
 desc2[0, 1] = 0.5
 desc2[1, 0] = 2
 desc2[1, 1] = 0
+desc2[2, 0] = float('inf')
+desc2[2, 1] = 0
 
 try_this('6.1', produceMatches, [((0, 0, 0.125), (1, 0, 0.1))], compare_array, desc1, desc2)
