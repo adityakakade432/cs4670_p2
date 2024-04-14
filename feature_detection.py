@@ -177,9 +177,9 @@ def computeMOPSDescriptors(image, features):
         #s_m = np.zeros((4,4))
         #t2_m = np.zeros((2,4))
 
-        r_m = transformations.get_rot_mx(0, 0, f[2])
-        t1_m_init= transformations.get_trans_mx(np.array([f[0], f[1], 0]))
-        t2_m_init = transformations.get_trans_mx(np.array([-4, -4, 0]))
+        r_m = transformations.get_rot_mx(0, 0, f[2] * np.pi / 180)
+        t1_m_init= transformations.get_trans_mx(np.array([-f[0], -f[1], 0]))
+        t2_m_init = transformations.get_trans_mx(np.array([4, 4, 0]))
         s_m = transformations.get_scale_mx(0.2, 0.2, 1)
 
         transMx_init = t2_m_init @ s_m @ r_m @ t1_m_init
@@ -200,13 +200,13 @@ def computeMOPSDescriptors(image, features):
         # TODO-BLOCK-BEGIN
 
         sub_mean = np.array(destImage) - np.mean(np.array(destImage))
-        norm = np.linalg.norm(sub_mean)
-        normalized = sub_mean / norm
+        if np.var(np.array(destImage)) < float('1e-10'):
+            normalized = 0
+        else:
+            normalized = sub_mean / np.var(np.array(destImage))
+            normalized = normalized.flatten()
 
-        if np.var(normalized) < float('1e-10'):
-             normalized = normalized * 0
-
-        desc[i] = normalized.flatten()
+        desc[i] = normalized
         # TODO-BLOCK-END
 
     return desc
