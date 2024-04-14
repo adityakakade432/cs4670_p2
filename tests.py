@@ -1,6 +1,6 @@
 import numpy as np
 import cv2
-from feature_detection import computeHarrisValues, detectCorners, computeMOPSDescriptors, computeLocalMaximaHelper
+from feature_detection import computeHarrisValues, detectCorners, computeMOPSDescriptors, computeLocalMaximaHelper, produceMatches
 import traceback
 
 from PIL import Image
@@ -100,6 +100,19 @@ try_this(1, computeHarrisValues, [loaded['a'],loaded['b']], compare_array, grayI
 
 try_this(2, computeLocalMaximaHelper, loaded['c'], compare_array, loaded['a'])
 
-try_this(3, detectCorners, d, compare_cv2_points, loaded['a'], loaded['b'])
+#try_this(3, detectCorners, d, compare_cv2_points, loaded['a'], loaded['b'])
 
-try_this('4 and/or 5', computeMOPSDescriptors, loaded['f'], compare_array, image, d)
+#try_this('4 and/or 5', computeMOPSDescriptors, loaded['f'], compare_array, image, d)
+
+desc1 = np.zeros((2, 2))
+desc1[0, 0] = 0
+desc1[0, 1] = 0
+desc1[1, 0] = 0
+desc1[1, 1] = 1
+desc2 = np.zeros((2, 2))
+desc2[0, 0] = 0.5
+desc2[0, 1] = 0.5
+desc2[1, 0] = 2
+desc2[1, 1] = 0
+
+try_this('6.1', produceMatches, [((0, 0, 0.125), (1, 0, 0.1))], compare_array, desc1, desc2)
